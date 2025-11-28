@@ -3,189 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>灯辰文化 - 场控后台 (安全版)</title>
+    <title>灯辰 - 场控后台 (诊断修复版)</title>
     <style>
         :root {
-            /* === 白天模式 === */
-            --bg-color: #f5f7fa;       
-            --card-bg: #ffffff;        
-            --text-main: #2c3e50;      
-            --text-sub: #7f8c8d;       
-            --border-color: #edf2f7;   
-            --brand-gold: #d4a024;     
-            
+            --bg-color: #f5f7fa; --card-bg: #ffffff; --text-main: #2c3e50; --text-sub: #7f8c8d;
+            --border-color: #edf2f7; --brand-gold: #d4a024;
             /* 状态色 */
-            --c-free: #c6f6d5; --t-free: #22543d; 
-            --c-busy: #fed7d7; --t-busy: #822727; 
-            --c-prep: #ffeebc; --t-prep: #744210; 
-            --c-rest: #e2e8f0; --t-rest: #4a5568; 
-            
-            --radius: 16px; 
+            --c-free: #c6f6d5; --t-free: #22543d;
+            --c-busy: #fed7d7; --t-busy: #822727;
+            --c-prep: #ffeebc; --t-prep: #744210;
+            --c-rest: #e2e8f0; --t-rest: #4a5568;
+            --radius: 16px;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding: 20px;
-            padding-bottom: 100px;
-            max-width: 800px; margin: 0 auto;
-        }
-
-        /* === 登录遮罩层 === */
-        #login-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #1a1a1a; /* 深色背景，防止看到后面 */
-            z-index: 99999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 20px;
-        }
-        .login-box {
-            background: #fff; padding: 30px; border-radius: 16px; width: 100%; max-width: 350px;
-            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .login-box h2 { margin: 0 0 20px 0; color: #333; font-size: 20px; }
-        .login-box input {
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
-            font-size: 16px; margin-bottom: 15px; outline: none; text-align: center;
-        }
-        .login-box input:focus { border-color: var(--brand-gold); }
-        .login-box button {
-            width: 100%; padding: 12px; background: var(--brand-gold); color: #fff;
-            border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;
-        }
-        .login-box .tip { margin-top: 15px; font-size: 12px; color: #888; }
-
-        /* === 正常页面样式 === */
-        header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; padding: 0 5px;
-        }
-        h1 { font-size: 20px; font-weight: 800; color: #2d3748; letter-spacing: 0.5px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; background: var(--bg-color); color: var(--text-main); padding: 15px; padding-bottom: 100px; max-width: 800px; margin: 0 auto; }
         
-        .refresh-btn {
-            background: white; color: #4a5568; border: 1px solid #cbd5e0;
-            padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer;
-        }
+        /* 头部 */
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 5px; }
+        h1 { font-size: 20px; font-weight: 800; color: #2d3748; }
+        .refresh-btn { background: #fff; border: 1px solid #cbd5e0; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-        .card-section {
-            background: var(--card-bg); border-radius: var(--radius); padding: 20px;
-            margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #fff;
-        }
-        .section-title {
-            font-size: 15px; color: #4a5568; font-weight: 700; margin-bottom: 15px;
-            display: flex; align-items: center; gap: 8px;
-            border-left: 4px solid var(--brand-gold); padding-left: 10px;
-        }
+        /* 错误提示区 */
+        #status-msg { text-align: center; padding: 20px; font-size: 14px; color: #718096; background: #edf2f7; border-radius: 12px; margin-bottom: 20px; display: none; }
+        #status-msg.error { background: #fff5f5; color: #c53030; border: 1px solid #fc8181; display: block; }
 
+        /* 表单卡片 */
+        .card-section { background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #fff; }
+        .section-title { font-size: 15px; font-weight: 700; margin-bottom: 15px; border-left: 4px solid var(--brand-gold); padding-left: 10px; }
+        
+        /* 控件 */
         .form-row { display: grid; gap: 12px; margin-bottom: 12px; }
         .grid-2 { grid-template-columns: 1fr 1fr; }
-        label { display: block; font-size: 12px; color: var(--text-sub); margin-bottom: 6px; margin-left: 2px; }
-        
-        input, select {
-            width: 100%; padding: 12px; background: #f7fafc; border: 1px solid #e2e8f0;
-            border-radius: 10px; color: #2d3748; font-size: 15px; outline: none;
-            appearance: none; -webkit-appearance: none; transition: border 0.2s;
-        }
+        label { display: block; font-size: 12px; color: var(--text-sub); margin-bottom: 6px; }
+        input, select { width: 100%; padding: 12px; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 15px; outline: none; -webkit-appearance: none; }
         input:focus, select:focus { border-color: var(--brand-gold); background: #fff; }
-        
-        .file-wrapper {
-            position: relative; background: #f7fafc; border: 2px dashed #cbd5e0;
-            border-radius: 10px; padding: 12px; text-align: center; cursor: pointer;
-        }
+        .file-wrapper { position: relative; background: #f7fafc; border: 2px dashed #cbd5e0; border-radius: 10px; padding: 12px; text-align: center; }
         .file-wrapper input { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; }
         .upload-txt { font-size: 13px; color: #718096; }
-
-        .btn-primary {
-            width: 100%; padding: 12px; background: linear-gradient(135deg, #eebb66, #d69e2e);
-            color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 12px rgba(214, 158, 46, 0.25);
-        }
         
+        .btn-primary { width: 100%; padding: 12px; background: linear-gradient(135deg, #eebb66, #d69e2e); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(214, 158, 46, 0.25); }
         .tags { display: flex; gap: 8px; margin-top: 8px; overflow-x: auto; }
-        .tag {
-            background: #edf2f7; color: #4a5568; padding: 5px 10px; border-radius: 15px;
-            font-size: 12px; cursor: pointer; white-space: nowrap;
-        }
-
+        .tag { background: #edf2f7; padding: 5px 10px; border-radius: 15px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+        
+        /* 列表 */
         .master-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
-        .master-card {
-            background: white; border-radius: var(--radius); padding: 18px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #edf2f7; position: relative;
-        }
-        .btn-del {
-            position: absolute; top: 15px; right: 15px; width: 28px; height: 28px; border-radius: 50%;
-            background: #fff5f5; color: #fc8181; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px;
-        }
+        .master-card { background: white; border-radius: var(--radius); padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #edf2f7; position: relative; }
+        .btn-del { position: absolute; top: 15px; right: 15px; width: 28px; height: 28px; border-radius: 50%; background: #fff5f5; color: #fc8181; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 14px; }
+        
         .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
         .avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         .info h3 { margin: 0; font-size: 18px; color: #2d3748; }
-        
         .time-display { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 13px; color: #718096; font-family: monospace; }
         .btn-now { background: #ebf8ff; color: #3182ce; border: none; padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; }
 
         .status-btns { display: flex; gap: 6px; margin-bottom: 12px; }
-        .btn-st {
-            flex: 1; padding: 10px 0; border: 1px solid #e2e8f0; border-radius: 8px;
-            background: #fff; color: #718096; font-size: 13px; cursor: pointer; transition: all 0.2s; font-weight: 600;
-        }
+        .btn-st { flex: 1; padding: 10px 0; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; color: #718096; font-size: 13px; cursor: pointer; transition: all 0.2s; font-weight: 600; }
         .btn-st.active[data-s="空闲"] { background: var(--c-free); color: var(--t-free); border-color: var(--c-free); }
         .btn-st.active[data-s="忙碌"] { background: var(--c-busy); color: var(--t-busy); border-color: var(--c-busy); }
         .btn-st.active[data-s="准备"] { background: var(--c-prep); color: var(--t-prep); border-color: var(--c-prep); }
         .btn-st.active[data-s="休息"] { background: var(--c-rest); color: var(--t-rest); border-color: var(--c-rest); }
 
-        #toast {
-            position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
-            background: rgba(45, 55, 72, 0.95); color: #fff; padding: 12px 24px; border-radius: 30px;
-            font-size: 14px; font-weight: 600; opacity: 0; transition: opacity 0.3s; z-index: 999; pointer-events: none;
-        }
-        #loading { text-align:center; color:#a0aec0; padding: 40px; font-size: 14px; }
+        #toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: #2d3748; color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 600; opacity: 0; transition: opacity 0.3s; z-index: 999; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <div id="login-layer">
-        <div class="login-box">
-            <h2>灯辰文化 · 场控后台</h2>
-            <input type="password" id="pwd-input" placeholder="请输入访问密码" onkeydown="if(event.key==='Enter') doLogin()">
-            <button onclick="doLogin()">进入系统</button>
-            <div class="tip">仅限内部工作人员访问</div>
-        </div>
-    </div>
-
     <header>
-        <h1>场控后台</h1>
+        <h1>灯辰 · 场控后台</h1>
         <button class="refresh-btn" onclick="init()">⟳ 刷新</button>
     </header>
 
+    <div id="status-msg">正在连接系统...</div>
+
     <section class="card-section">
-        <div class="section-title">👤 新增大师入驻</div>
+        <div class="section-title">👤 新增大师</div>
         <div class="form-row grid-2">
+            <div><label>大师姓名</label><input type="text" id="new-master-name" placeholder="输入名字"></div>
             <div>
-                <label>大师法号/姓名</label>
-                <input type="text" id="new-master-name" placeholder="输入名字">
-            </div>
-            <div>
-                <label>头像 (可选)</label>
+                <label>头像</label>
                 <div class="file-wrapper">
                     <span class="upload-txt" id="file-label">选择图片</span>
                     <input type="file" id="new-master-file" accept="image/*" onchange="handleFile(this)">
                 </div>
             </div>
         </div>
-        <button class="btn-primary" id="btn-create-master" onclick="addMaster()">确认添加大师</button>
+        <button class="btn-primary" id="btn-create-master" onclick="addMaster()">确认添加</button>
     </section>
 
     <section class="card-section">
-        <div class="section-title">📅 新增预约排班</div>
+        <div class="section-title">📅 新增预约</div>
         <div class="form-row">
-            <div>
-                <label>选择大师</label>
-                <select id="sel-master"><option value="">加载中...</option></select>
-            </div>
+            <div><label>选择大师</label><select id="sel-master"><option value="">加载中...</option></select></div>
         </div>
         <div class="form-row">
             <div>
@@ -202,106 +110,89 @@
             <div><label>日期</label><input type="date" id="inp-date"></div>
             <div><label>时间 (24h)</label><input type="time" id="inp-time"></div>
         </div>
-        <button class="btn-primary" id="btn-add-appt" onclick="addAppointment()">确认添加预约</button>
+        <button class="btn-primary" id="btn-add-appt" onclick="addAppointment()">确认预约</button>
     </section>
 
-    <div class="section-title" style="padding-left:5px; border:none;">🎛️ 状态实时控制</div>
-    <div id="loading">数据加载中...</div>
+    <div class="section-title" style="padding-left:5px; border:none;">🎛️ 状态控制</div>
     <div class="master-grid" id="list"></div>
-    
     <div id="toast"></div>
 
     <script>
-        // ================= 配置区 =================
         const API_TOKEN = 'uskRMINs8MRQZD07iTNuNnl';
         const SHEET_ID = 'dstmgbUypiy0LbUzwF';
-        // 安全密码
-        const SAFE_PWD = 'dcwh8888';
-        // =========================================
-
         const STATUS_MAP = ['空闲', '忙碌', '准备', '休息'];
-        let masterList = [];
+        let masterNames = [];
 
-        // === 🔐 登录逻辑 ===
-        function checkLogin() {
-            const isLogged = sessionStorage.getItem('dc_admin_logged');
-            if (isLogged === 'true') {
-                document.getElementById('login-layer').style.display = 'none';
-                init(); // 登录过直接加载
-            }
-        }
-        
-        function doLogin() {
-            const input = document.getElementById('pwd-input').value;
-            if (input === SAFE_PWD) {
-                sessionStorage.setItem('dc_admin_logged', 'true');
-                document.getElementById('login-layer').style.display = 'none';
-                init(); // 密码正确，开始加载数据
-            } else {
-                alert('密码错误！');
-                document.getElementById('pwd-input').value = '';
-            }
-        }
-
-        // --- 页面逻辑 ---
+        // 工具
         function initTime() {
             const now = new Date();
             const offset = now.getTimezoneOffset() * 60000;
             const local = new Date(now.getTime() - offset);
             document.getElementById('inp-date').value = local.toISOString().split('T')[0];
-            const hh = String(local.getHours()).padStart(2, '0');
-            const mm = String(local.getMinutes()).padStart(2, '0');
-            document.getElementById('inp-time').value = `${hh}:${mm}`;
+            document.getElementById('inp-time').value = local.toISOString().split('T')[1].substring(0, 5);
         }
-
         function setClient(val) { document.getElementById('inp-client').value = val; }
         function handleFile(input) { if(input.files[0]) document.getElementById('file-label').innerText = input.files[0].name; }
-
         function showToast(msg, isErr=false) {
             const t = document.getElementById('toast');
             t.innerText = msg;
-            t.style.backgroundColor = isErr ? '#2d3748' : '#2d3748'; // 统一深色底，简约
-            if(isErr) t.innerText = "❌ " + msg;
-            t.style.opacity = 1;
-            setTimeout(()=>t.style.opacity=0, 2500);
+            t.style.background = isErr ? '#fff5f5' : '#2d3748';
+            t.style.color = isErr ? '#c53030' : '#fff';
+            t.style.opacity = 1; setTimeout(()=>t.style.opacity=0, 3000);
         }
 
         // 核心加载
         async function init() {
             const list = document.getElementById('list');
-            const loading = document.getElementById('loading');
+            const msg = document.getElementById('status-msg');
             const sel = document.getElementById('sel-master');
             
-            loading.style.display = 'block';
+            msg.style.display = 'block';
+            msg.className = '';
+            msg.innerText = '正在连接维格表数据...';
             list.innerHTML = '';
-            masterList = [];
+            masterNames = [];
             initTime();
 
             try {
+                // 使用 fieldKey=name 确保按中文列名读取
                 const url = `https://api.vika.cn/fusion/v1/datasheets/${SHEET_ID}/records?fieldKey=name`;
                 const res = await fetch(url, { headers: { 'Authorization': `Bearer ${API_TOKEN}` } });
-                const json = await res.json();
+                
+                // 网络层错误捕获
+                if (!res.ok) {
+                    if(res.status === 401) throw new Error("Token 无效 (401)");
+                    if(res.status === 404) throw new Error("表格ID错误 (404)");
+                    if(res.status === 429) throw new Error("请求太快 (429)");
+                    throw new Error(`HTTP错误: ${res.status}`);
+                }
 
+                const json = await res.json();
                 if(json.code !== 200) throw new Error(json.message);
 
-                loading.style.display = 'none';
+                // 成功
+                msg.style.display = 'none';
                 
-                const mSet = new Set();
-                json.data.records.forEach(r => { if(r.fields['大师']) mSet.add(r.fields['大师']); });
+                const tempSet = new Set();
+                json.data.records.forEach(r => { if(r.fields['大师']) tempSet.add(r.fields['大师']); });
                 
                 sel.innerHTML = '<option value="">-- 请选择 --</option>';
-                mSet.forEach(m => {
+                tempSet.forEach(m => {
                     const opt = document.createElement('option');
                     opt.value = m; opt.innerText = m;
                     sel.appendChild(opt);
                 });
 
-                renderList(json.data.records);
+                renderCards(json.data.records);
 
-            } catch(e) { loading.innerText = '❌ ' + e.message; }
+            } catch(e) {
+                msg.className = 'error';
+                msg.innerText = '⚠️ 连接失败: ' + e.message;
+                console.error(e);
+            }
         }
 
-        function renderList(records) {
+        function renderCards(records) {
             const list = document.getElementById('list');
             
             records.forEach(r => {
@@ -313,13 +204,14 @@
                 const client = f['客户'] || '';
                 const date = f['日期'] || '--';
                 const time = f['时间'] || '--';
-                const stRaw = f['状态干预'] || '空闲';
+                const stRaw = f['状态干预'] || ''; // 默认为空，即自动
                 const avatar = (f['头像'] && f['头像'][0]) ? f['头像'][0].url : 'https://via.placeholder.com/100/eee/ccc?text=师';
 
-                let active = '空闲';
+                let active = '自动'; // 默认无高亮
+                if(stRaw.includes('空')) active='空闲';
                 if(stRaw.includes('忙')) active='忙碌';
-                else if(stRaw.includes('备')||stRaw.includes('候')) active='准备';
-                else if(stRaw.includes('休')||stRaw.includes('暂')) active='休息';
+                if(stRaw.includes('备')||stRaw.includes('候')) active='准备';
+                if(stRaw.includes('休')) active='休息';
 
                 const div = document.createElement('div');
                 div.className = 'master-card';
@@ -338,7 +230,7 @@
                     </div>
                     <div class="status-btns">
                         ${STATUS_MAP.map(s => `
-                            <button class="btn-st ${active===s?'active':''}" data-s="${s}" 
+                            <button class="btn-st ${active===s?'active':''}" 
                                 onclick="changeSt('${rid}', '${s}', this)">${s}</button>
                         `).join('')}
                     </div>
@@ -352,6 +244,7 @@
             });
         }
 
+        // API 操作
         async function addMaster() {
             const name = document.getElementById('new-master-name').value;
             const fileInp = document.getElementById('new-master-file');
@@ -371,7 +264,7 @@
                     if(upJson.code===200) avatarData = [upJson.data];
                 }
                 const now = new Date();
-                const payload = { "fields": { "大师": name, "状态干预": "空闲 · 纳客", "头像": avatarData, "日期": now.toISOString().split('T')[0], "时间": "09:00" }};
+                const payload = { "fields": { "大师": name, "状态干预": "", "头像": avatarData, "日期": now.toISOString().split('T')[0], "时间": "09:00" }};
                 await postRecord(payload);
                 showToast('大师添加成功');
                 document.getElementById('new-master-name').value = '';
@@ -390,7 +283,8 @@
             const btn = document.getElementById('btn-add-appt');
             btn.disabled = true; btn.innerText = '提交中...';
 
-            const payload = { "fields": { "大师": master, "客户": client, "日期": date, "时间": time, "状态干预": "恭候 · 待启" }};
+            // 状态默认为空字符串，启用大屏自动判断
+            const payload = { "fields": { "大师": master, "客户": client, "日期": date, "时间": time, "状态干预": "" }};
             try {
                 await postRecord(payload);
                 showToast('预约添加成功');
@@ -438,7 +332,7 @@
                     method: 'PATCH', headers: { 'Authorization': `Bearer ${API_TOKEN}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ "records": [{ "recordId": rid, "fields": fields }] })
                 });
-                showToast('已更新');
+                showToast('✅ 更新成功');
             } catch(e) { showToast('网络错误', true); }
         }
 
@@ -449,12 +343,11 @@
                     method: 'DELETE', headers: { 'Authorization': `Bearer ${API_TOKEN}` }
                 });
                 el.closest('.master-card').remove();
-                showToast('已删除');
+                showToast('🗑️ 已删除');
             } catch(e) { showToast('删除失败', true); }
         }
 
-        // 执行登录检查
-        checkLogin();
+        init();
     </script>
 </body>
 </html>
